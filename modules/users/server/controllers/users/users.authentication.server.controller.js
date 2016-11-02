@@ -7,7 +7,8 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  jwt = require('jsonwebtoken');
 
 // URLs for which user can't be redirected on signin
 var noReturnUrls = [
@@ -68,7 +69,12 @@ exports.signin = function (req, res, next) {
         if (err) {
           res.status(400).send(err);
         } else {
-          res.json(user);
+          var token = jwt.sign({ id: user._id }, 'ImagineOnTheWorld');
+          res.json({
+            'user': user,
+            'token': token
+          });
+          // res.json(user);
         }
       });
     }
@@ -80,7 +86,7 @@ exports.signin = function (req, res, next) {
  */
 exports.signout = function (req, res) {
   req.logout();
-  res.redirect('/');
+  res.json({ 'status': true });
 };
 
 /**

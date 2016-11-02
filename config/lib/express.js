@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Module dependencies.
- */
+* Module dependencies.
+*/
 var config = require('../config'),
   express = require('express'),
   morgan = require('morgan'),
@@ -20,8 +20,8 @@ var config = require('../config'),
   path = require('path');
 
 /**
- * Initialize local variables
- */
+* Initialize local variables
+*/
 module.exports.initLocalVariables = function (app) {
   // Setting application local variables
   app.locals.title = config.app.title;
@@ -44,11 +44,25 @@ module.exports.initLocalVariables = function (app) {
     res.locals.url = req.protocol + '://' + req.headers.host + req.originalUrl;
     next();
   });
+
+  app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Expose-Headers', 'X-Api-Version, X-Request-Id, X-Response-Time');
+    res.header('Access-Control-Max-Age', '1000');
+    if (req.method === 'OPTIONS') {
+      res.send(200);
+    } else {
+      next();
+    }
+  });
 };
 
 /**
- * Initialize application middleware
- */
+* Initialize application middleware
+*/
 module.exports.initMiddleware = function (app) {
   // Showing stack errors
   app.set('showStackError', true);
@@ -91,8 +105,8 @@ module.exports.initMiddleware = function (app) {
 };
 
 /**
- * Configure view engine
- */
+* Configure view engine
+*/
 module.exports.initViewEngine = function (app) {
   // Set swig as the template engine
   app.engine('server.view.html', consolidate[config.templateEngine]);
@@ -103,8 +117,8 @@ module.exports.initViewEngine = function (app) {
 };
 
 /**
- * Configure Express session
- */
+* Configure Express session
+*/
 module.exports.initSession = function (app, db) {
   // Express MongoDB session storage
   app.use(session({
@@ -125,8 +139,8 @@ module.exports.initSession = function (app, db) {
 };
 
 /**
- * Invoke modules server configuration
- */
+* Invoke modules server configuration
+*/
 module.exports.initModulesConfiguration = function (app, db) {
   config.files.server.configs.forEach(function (configPath) {
     require(path.resolve(configPath))(app, db);
@@ -134,8 +148,8 @@ module.exports.initModulesConfiguration = function (app, db) {
 };
 
 /**
- * Configure Helmet headers configuration
- */
+* Configure Helmet headers configuration
+*/
 module.exports.initHelmetHeaders = function (app) {
   // Use helmet to secure Express headers
   var SIX_MONTHS = 15778476000;
@@ -152,8 +166,8 @@ module.exports.initHelmetHeaders = function (app) {
 };
 
 /**
- * Configure the modules static routes
- */
+* Configure the modules static routes
+*/
 module.exports.initModulesClientRoutes = function (app) {
   // Setting the app router and static folder
   app.use('/', express.static(path.resolve('./public')));
@@ -165,8 +179,8 @@ module.exports.initModulesClientRoutes = function (app) {
 };
 
 /**
- * Configure the modules ACL policies
- */
+* Configure the modules ACL policies
+*/
 module.exports.initModulesServerPolicies = function (app) {
   // Globbing policy files
   config.files.server.policies.forEach(function (policyPath) {
@@ -175,8 +189,8 @@ module.exports.initModulesServerPolicies = function (app) {
 };
 
 /**
- * Configure the modules server routes
- */
+* Configure the modules server routes
+*/
 module.exports.initModulesServerRoutes = function (app) {
   // Globbing routing files
   config.files.server.routes.forEach(function (routePath) {
@@ -185,8 +199,8 @@ module.exports.initModulesServerRoutes = function (app) {
 };
 
 /**
- * Configure error handling
- */
+* Configure error handling
+*/
 module.exports.initErrorRoutes = function (app) {
   app.use(function (err, req, res, next) {
     // If the error object doesn't exists
@@ -203,8 +217,8 @@ module.exports.initErrorRoutes = function (app) {
 };
 
 /**
- * Configure Socket.io
- */
+* Configure Socket.io
+*/
 module.exports.configureSocketIO = function (app, db) {
   // Load the Socket.io configuration
   var server = require('./socket.io')(app, db);
@@ -214,8 +228,8 @@ module.exports.configureSocketIO = function (app, db) {
 };
 
 /**
- * Initialize the Express application
- */
+* Initialize the Express application
+*/
 module.exports.init = function (db) {
   // Initialize express app
   var app = express();
