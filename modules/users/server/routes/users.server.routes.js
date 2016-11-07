@@ -2,10 +2,11 @@
 
 module.exports = function (app) {
   // User Routes
+  var passport = require('passport');
   var users = require('../controllers/users.server.controller');
 
   // Setting up the users profile api
-  app.route('/api/users/me').get(users.me);
+  app.route('/api/users/me').get(passport.authenticate('jwt', { session: false }), users.me);
   app.route('/api/users').put(users.update);
   app.route('/api/users/accounts').delete(users.removeOAuthProvider);
   app.route('/api/users/password').post(users.changePassword);

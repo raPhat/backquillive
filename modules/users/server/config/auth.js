@@ -12,7 +12,6 @@ var params = {
 
 var _ = require('lodash'),
   mongoose = require('mongoose'),
-  mongoose = require('mongoose'),
   User = mongoose.model('User');
 
 module.exports = function() {
